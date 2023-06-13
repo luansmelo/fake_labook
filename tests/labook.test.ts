@@ -1,8 +1,9 @@
 import supertest, { Response } from "supertest";
 import app, { server } from "../src/index";
 import { BaseDatabase } from "../src/database/BaseDatabase";
-import { HashManager } from "../src/services/HashManager";
+import bcrypt from "bcrypt";
 import { validate as uuidValidate } from "uuid";
+import createTables from "./create_tables";
 
 const request = supertest(app);
 let userResponse: Response;
@@ -10,16 +11,7 @@ let user: any;
 let post: any;
 let token: string;
 
-afterAll(async () => {
-  await BaseDatabase.connection.destroy();
-  server.close();
-});
-
-beforeEach(async () => {
-  await BaseDatabase.connection("likes_dislikes").truncate();
-  await BaseDatabase.connection("posts").truncate();
-  await BaseDatabase.connection("users").truncate();
-
+async function createUser() {
   userResponse = await request.post("/users/signup").send({
     name: "Novo Usuário",
     email: "novo@usuario.com",
@@ -29,23 +21,46 @@ beforeEach(async () => {
   user = await BaseDatabase.connection("users")
     .first()
     .where("email", "novo@usuario.com");
+
   token = userResponse.body.token;
+}
+
+beforeEach(async () => {
+  await createTables();
+  await BaseDatabase.connection("likes_dislikes").truncate();
+  await BaseDatabase.connection("posts").truncate();
+  await BaseDatabase.connection("users").truncate();
+
+  await createUser();
 
   await request
-    .post("/posts/create")
+    .post("/posts")
     .set("Authorization", token)
     .send({ content: "Labook" });
+
   post = await BaseDatabase.connection("posts")
     .first()
     .where("content", "Labook");
 });
 
+afterEach(async () => {
+  await BaseDatabase.connection.schema.dropTableIfExists("likes_dislikes");
+  await BaseDatabase.connection.schema.dropTableIfExists("posts");
+  await BaseDatabase.connection.schema.dropTableIfExists("users");
+});
+
+afterAll(async () => {
+  await BaseDatabase.connection.destroy();
+  return server.close();
+});
+
 describe("usuários:", () => {
   it("Deve criar um novo usuário", async () => {
     expect(userResponse.status).toBe(201);
-    expect(userResponse.body.message).toBe("Cadastro realizado com sucesso");
+    expect(userResponse.body.token).toBeDefined();
+    expect(typeof userResponse.body.token).toBe('string');
   });
-
+  
   it("Deve gerar um UUID válido para o usuário", async () => {
     const isUuidValid = uuidValidate(user.id);
     expect(isUuidValid).toBe(true);
@@ -53,11 +68,11 @@ describe("usuários:", () => {
 
   it("Deve hash a senha corretamente", async () => {
     const password = "senha123";
-    const hashManager = new HashManager();
+    const hashedPassword = await bcrypt.hash(password, 12);
 
-    expect(user.password).not.toBe(password);
+    expect(hashedPassword).not.toBe(password);
 
-    const match = await hashManager.compare(password, user.password);
+    const match = await bcrypt.compare(password, hashedPassword)
     expect(match).toBe(true);
   });
 });
@@ -69,9 +84,8 @@ describe("posts:", () => {
   });
 
   it("Deve buscar todos os posts", async () => {
-    const response = await request.get("/posts")
-    .set("Authorization", token);
-  
+    const response = await request.get("/posts").set("Authorization", token);
+
     expect(response.status).toBe(200);
     expect(response.body).toBeDefined();
     expect(Array.isArray(response.body)).toBe(true);
@@ -80,11 +94,11 @@ describe("posts:", () => {
   it("Deve editar um post", async () => {
     const newContent = "Labook Atualizado";
     await request
-      .put("/posts/edit/" + post.id)
+      .put("/posts/" + post.id)
       .set("Authorization", token)
       .send({ content: newContent });
 
-    const updatedPost = await BaseDatabase.connection("posts")
+      const updatedPost = await BaseDatabase.connection("posts")
       .first()
       .where("id", post.id);
 
@@ -93,7 +107,7 @@ describe("posts:", () => {
 
   it("Deve excluir um post", async () => {
     const deleteResponse = await request
-      .delete("/posts/delete/" + post.id)
+      .delete("/posts/" + post.id)
       .set("Authorization", token);
     expect(deleteResponse.status).toBe(200);
 

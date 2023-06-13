@@ -1,46 +1,28 @@
-# Projeto Labook
+Notas Importantes
+O projeto já está configurado com uma arquitetura de software adequada. Todos os arquivos e pastas necessários já estão presentes, incluindo services, index.ts e database.
 
+O arquivo BaseDatabase está configurado para usar o SQLite e tem um conjunto específico de configurações para estabelecer a conexão com o banco de dados.
 
-Um projeto chamado Labook cuja intenção é treinar todo o conhecimento adquirido atraves do curso, em relação a back-end utilizando POO e arquitetura limpa.
+Para iniciar o servidor corretamente, é essencial que você exporte o app antes de invocar o listen no arquivo index.ts. Por exemplo: export const server = app.listen(....
 
-## Indice
+Fique atento ao nome dos arquivos e evite erros de digitação. Por exemplo, o arquivo BaseDatabase não deve ser escrito como BaseDataBase.
 
-- <a href="#-rodar">Rodar</a>
-- <a href="#-tecnologias">Tecnologias Utilizadas</a>
-- <a href="#-autoras">Autoras</a>
-- <a href="#-passos">Passos</a>
+Certifique-se de que seu código não contém erros antes de tentar executar o projeto.
 
-## Como rodar esse projeto?
+Executando os Testes
+Para que os testes sejam executados corretamente, é importante que todas as dependências e requisitos sejam atendidos. Arquivos importantes, como BaseDatabase, devem ser mantidos como estão.
 
-```bash
-# Clone este repositorio
-$ git clone linkrepo
+Importando as Rotas
+No arquivo index.ts, você precisará importar corretamente as rotas do usuário e do post.
 
-# Acesse a pasta do projeto no seu terminal
-$ cd projeto-labook
+Avaliando as Rotas
+Certifique-se de que as rotas seguem o padrão apropriado:
 
-# Instale as dependências
-$ npm install
-
-# Execute a aplicação
-$ npm run dev
-```
-
-## Tecnologias Utilizadas
-
-1. [Typescript](https://www.typescriptlang.org/)
-2. [Express](https://expressjs.com/pt-br/)
-3. [Knex](https://knexjs.org/)
-
-## Pessoas Autoras
-
-<img style= "width:200px" src="./src/imagens/111094464.jpeg" alt="Imagem do desenvolvedor"></img>
-
-[Linkedin](https://www.linkedin.com/in/gabriel-garuthi/) 
-
-[Github](https://github.com/Gabrielgarg)
-
-## Prossimos passos
-
-- [ ] Criar seus dados.
-- [ ] Se divertir!
+POST /users/signup
+POST /users/login
+GET /posts
+POST /posts
+PUT /posts/:id
+DELETE /posts/:id
+PUT /posts/:id/like
+Verifique se as rotas estão corretamente implementadas e se correspondem ao padrão acima. A implementação correta dessas rotas é crucial para o funcionamento adequado do projeto.
