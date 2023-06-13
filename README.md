@@ -1,6 +1,6 @@
 # Notas Importantes
 
-O projeto já está configurado com uma arquitetura de software adequada. Todos os arquivos e pastas necessários já estão presentes, incluindo `services`, `index.ts` e `database`.
+O projeto já está configurado com uma arquitetura de software adequada. Todos os arquivos e pastas necessários já estão presentes, incluindo `index.ts` e `database`.
 
 O arquivo `BaseDatabase` está configurado para usar o SQLite e tem um conjunto específico de configurações para estabelecer a conexão com o banco de dados.
 
