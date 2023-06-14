@@ -33,7 +33,7 @@ beforeEach(async () => {
 
   await createUser();
 
-  await request
+  const response = await request
     .post("/posts")
     .set("Authorization", token)
     .send({ content: "Labook" });
@@ -51,6 +51,7 @@ afterEach(async () => {
 
 afterAll(async () => {
   await BaseDatabase.connection.destroy();
+  await BaseDatabase.conection.destroy();
   return server.close();
 });
 
@@ -72,7 +73,7 @@ describe("usuários:", () => {
 
     expect(hashedPassword).not.toBe(password);
 
-    const match = await bcrypt.compare(password, hashedPassword)
+    const match = await bcrypt.compare(password, user.password)
     expect(match).toBe(true);
   });
 });

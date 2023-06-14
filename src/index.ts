@@ -1,7 +1,6 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-// importe aqui a rota de user e post do estudante!
 import userRouter from "./router/userRouter";
 import postRouter from "./router/postRouter";
 
